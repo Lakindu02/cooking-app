@@ -40,8 +40,8 @@ const Register = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
         <div className="max-w-md w-full space-y-6">
           <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-800">Create your account</h2>
-            <p className="text-gray-600 mt-2">Join our food community today</p>
+            <h2 className="text-3xl font-bold text-gray-600">Create your account</h2>
+            <p className="text-gray-500 mt-2">Join our food community today</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">
@@ -52,7 +52,7 @@ const Register = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-500 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                 placeholder="Enter your username"
               />
             </div>
