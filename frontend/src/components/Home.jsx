@@ -85,7 +85,7 @@ const Home = () => {
               Welcome back, <span className="text-orange-600">{username}</span>!
             </h1>
             <p className="text-lg text-gray-600">
-              Find your next training partner or join a skills workshop
+              Find your next cooking partner or join a skills
             </p>
           </div>
 
@@ -122,7 +122,7 @@ const Home = () => {
             <div className="lg:w-2/4 w-full">
               <div className="bg-white rounded-xl shadow-md p-6">
                 <h2 className="text-xl font-bold text-blue-800 mb-6 flex items-center">
-                  <span className="mr-2">🏆</span> Upcoming Training Sessions
+                  <span className="mr-2">🏆</span> Upcoming cooking Sessions
                 </h2>
                 <div className="space-y-6">
                   {trainingSessions.map((session) => (
@@ -165,7 +165,7 @@ const Home = () => {
               <div className="bg-white rounded-xl shadow-md p-6">
                 <div className="flex justify-between items-center mb-4">
                   <h2 className="text-xl font-bold text-blue-800 flex items-center">
-                    <span className="mr-2">👥</span> Sport Communities
+                    <span className="mr-2">👥</span> Communities
                   </h2>
                   <button
                     onClick={() => setShowForm(!showForm)}
