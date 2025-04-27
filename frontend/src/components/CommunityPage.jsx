@@ -171,7 +171,7 @@ const CommunityPage = () => {
             {/* Members Section */}
             <div className="lg:w-1/4 w-full">
               <div className="bg-white p-6 rounded-xl shadow-lg sticky top-4">
-                <h3 className="text-2xl font-semibold text-[#F97316] mb-4">Community Members</h3>
+                <h3 className="text-2xl font-semibold text-[#7816f9] mb-4">Community Members</h3>
                 <div className="max-h-96 overflow-y-auto">
                   {community.members?.length > 0 ? (
                     <ul className="space-y-3">
@@ -182,7 +182,7 @@ const CommunityPage = () => {
                       ))}
                     </ul>
                   ) : (
-                    <p className="text-gray-500">No members yet.</p>
+                    <p className="text-gray-400">No members yet.</p>
                   )}
                 </div>
               </div>
@@ -362,7 +362,7 @@ const CommunityPage = () => {
                         <div className="flex justify-between items-center">
                           <button
                             onClick={() => handleLike(post.id)}
-                            className="flex items-center space-x-1 text-[#EF4444] hover:text-[#DC2626] transition"
+                            className="flex items-center space-x-1 text-[#8844ef] hover:text-[#c426dc] transition"
                           >
                             <span className="text-xl">❤️</span>
                             <span>{post.likes} Like{post.likes !== 1 ? 's' : ''}</span>
@@ -383,7 +383,7 @@ const CommunityPage = () => {
             <div className="lg:w-1/4 w-full">
               <div className="bg-white p-6 rounded-xl shadow-lg sticky top-4 space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-[#F97316] mb-2">Community Stats</h3>
+                  <h3 className="text-lg font-semibold text-[#16f94f] mb-2">Community Stats</h3>
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span className="text-gray-600">Members</span>
@@ -397,7 +397,7 @@ const CommunityPage = () => {
                 </div>
                 {isMember && (
                   <div className="space-y-3">
-                    <h3 className="text-lg font-semibold text-[#F97316] mb-2">Quick Actions</h3>
+                    <h3 className="text-lg font-semibold text-[#16f98b] mb-2">Quick Actions</h3>
                     <button
                       onClick={() => {
                         if (!getUserName()) return;
@@ -410,7 +410,7 @@ const CommunityPage = () => {
                     </button>
                     <button
                       onClick={handleLeaveCommunity}
-                      className="w-full bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300 transition"
+                      className="w-full bg-gray-200 text-gray-00 py-2 px-4 rounded-md hover:bg-gray-300 transition"
                     >
                       Leave Community
                     </button>
