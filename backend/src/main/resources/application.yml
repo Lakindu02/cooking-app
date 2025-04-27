@@ -1,0 +1,30 @@
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: "{baseUrl}/api/auth/oauth2/callback/google"
+            scope:
+              - email
+              - profile
+        provider:
+          google:
+            authorization-uri: https://accounts.google.com/o/oauth2/v2/auth
+            token-uri: https://oauth2.googleapis.com/token
+            user-info-uri: https://www.googleapis.com/oauth2/v3/userinfo
+
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+  application:
+    name: backend
+
+  data:
+    mongodb:
+      uri: mongodb+srv://cook:cook123@cooklearn.2vfdutg.mongodb.net/cook?retryWrites=true&w=majority&appName=CookLearn
