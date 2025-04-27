@@ -119,7 +119,7 @@ const Login = () => {
               className="space-y-1"
               whileHover={{ scale: 1.01 }}
             >
-              <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
+              <label className="block text-sm font-medium text-gray-600 mb-1 flex items-center">
                 <FaEnvelope className="mr-2 text-orange-500" />
                 Email
               </label>
@@ -129,7 +129,7 @@ const Login = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
+                  className="w-full pl-10 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="your@email.com"
                 />
                 <FaEnvelope className="absolute left-3 top-3.5 text-gray-400" />
@@ -153,10 +153,10 @@ const Login = () => {
                   className="w-full pl-10 pr-10 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent"
                   placeholder="•••••••"
                 />
-                <FaLock className="absolute left-3 top-3.5 text-gray-400" />
+                <FaLock className="absolute left-3 top-3.5 text-gray-500" />
                 <button 
                   type="button"
-                  className="absolute right-3 top-3.5 text-gray-400 hover:text-orange-500"
+                  className="absolute right-3 top-3.5 text-gray-400 hover:text-orange-400"
                   onClick={() => setShowPassword(!showPassword)}
                 >
                   {showPassword ? <FaEyeSlash /> : <FaEye />}
