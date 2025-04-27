@@ -100,7 +100,7 @@ public class FoodCommunityController {
     @GetMapping("/{id}/posts")
     public List<CommunityPost> getPostsByCommunity(@PathVariable String id) {
         return communityPostRepository.findByCommunityId(id);
-    }
+    }dkdkkdkd
 
    @PostMapping("/{id}/leave")
 public FoodCommunity leaveCommunity(@PathVariable String id, @RequestParam String userName) {
