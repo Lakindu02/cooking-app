@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>3.4.4</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
@@ -49,18 +49,23 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
-  
+
         <!-- Spring Data -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
         <!-- JWT -->
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
             <artifactId>jjwt</artifactId>
-            <version>0.12.6</version>
+            <version>0.9.1</version>
         </dependency>
         <dependency>
             <groupId>io.jsonwebtoken</groupId>
@@ -84,13 +89,13 @@
         <dependency>
             <groupId>com.google.api-client</groupId>
             <artifactId>google-api-client</artifactId>
-            <version>2.7.2</version>
+            <version>2.2.0</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.http-client</groupId>
             <artifactId>google-http-client-jackson2</artifactId>
-            <version>1.47.0</version>
+            <version>1.44.2</version>
         </dependency>
 
         <!-- Environment Variables (dotenv) -->
@@ -104,13 +109,13 @@
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
-            <version>2.4.0-b180830.0359</version>
+            <version>2.3.1</version>
         </dependency>
 
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>4.0.5</version>
+            <version>2.3.1</version>
         </dependency>
 
         <!-- JPA + H2 (Replace with MySQL/Postgres if needed) -->
@@ -124,13 +129,13 @@
         <dependency>
             <groupId>jakarta.persistence</groupId>
             <artifactId>jakarta.persistence-api</artifactId>
-            <version>3.2.0</version>
+            <version>3.1.0</version>
         </dependency>
 
             <dependency>
     <groupId>org.projectlombok</groupId>
     <artifactId>lombok</artifactId>
-    <version>1.18.38</version> <!-- latest version -->
+    <version>1.18.30</version> <!-- latest version -->
     <scope>provided</scope>
 </dependency>
 
