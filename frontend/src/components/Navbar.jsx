@@ -69,10 +69,10 @@ const Navbar = () => {
           </div>
 
           <div className="hidden md:flex space-x-8">
-            <Link to="/" className="text-gray-500 hover:text-[#F97316] font-medium">Home</Link>
-            <Link to="/explore" className="text-gray-500 hover:text-[#F97316] font-medium">Status</Link>
-            <Link to="/profile" className="text-gray-500 hover:text-[#F97316] font-medium">Profile</Link>
-            <Link to="/learning" className="text-gray-500 hover:text-[#F97316] font-medium">LearningPlans</Link>
+            <Link to="/" className="text-gray-600 hover:text-[#F97316] font-medium">Home</Link>
+            <Link to="/explore" className="text-gray-600 hover:text-[#F97316] font-medium">Explore</Link>
+            <Link to="/profile" className="text-gray-600 hover:text-[#F97316] font-medium">Profile</Link>
+            <Link to="/learning" className="text-gray-600 hover:text-[#F97316] font-medium">LearningPlans</Link>
           </div>
 
           <div className="flex items-center space-x-4">

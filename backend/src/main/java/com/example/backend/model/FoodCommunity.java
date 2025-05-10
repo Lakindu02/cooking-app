@@ -1,4 +1,3 @@
-// File: FoodCommunity.java
 package com.example.backend.model;
 
 import org.springframework.data.annotation.Id;
@@ -15,8 +14,10 @@ public class FoodCommunity {
     private String description;
 
     private List<String> members = new ArrayList<>();
+
     private String createdBy;
 
+    // Getters and setters
     public String getId() {
         return id;
     }
@@ -57,7 +58,8 @@ public class FoodCommunity {
         this.createdBy = createdBy;
     }
 
+    // Method to clean up the members when the community is deleted
     public void cleanUpMembers() {
-        this.members.clear();
+        this.members.clear();  // Remove all members from the list
     }
 }
