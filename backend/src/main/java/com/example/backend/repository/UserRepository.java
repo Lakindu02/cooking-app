@@ -10,4 +10,7 @@ public interface UserRepository extends MongoRepository<User, String> {
 
     // Custom query method to check if a user exists by email
     boolean existsByEmail(String email);
+
+    // Custom query method to find a user by username
+    Optional<User> findByUsername(String username);
 }
