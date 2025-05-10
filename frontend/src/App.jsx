@@ -6,6 +6,8 @@ import Login from "./components/Login";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
 import Navbar from "./components/Navbar";
+import CommunityPage from "./components/CommunityPage";
+import ProfilePage from "./components/UserProfile";
 
 import {
   auth,
@@ -61,6 +63,8 @@ function App() {
         />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/community/:id" element={<CommunityPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
       </Routes>
     </Router>
   );
