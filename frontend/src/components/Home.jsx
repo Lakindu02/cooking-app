@@ -7,6 +7,8 @@ import { FiHeart, FiMessageSquare, FiShare2, FiMoreHorizontal, FiEdit, FiTrash2,
 import { FaHeart, FaRunning, FaSwimmer, FaBasketballBall, FaFutbol } from "react-icons/fa";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Story from "./Status";
+
 
 const Home = () => {
   const [users, setUsers] = useState([]); 
@@ -387,6 +389,7 @@ const Home = () => {
       <Navbar />
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-blue-100 p-4 md:p-8 font-sans">
         <div className="max-w-7xl mx-auto">
+        <Story />
           {/* Welcome Header */}
           <div className="mb-8 text-center bg-white rounded-xl shadow-sm p-6">
             <h1 className="text-3xl md:text-4xl font-bold text-blue-800 mb-2">

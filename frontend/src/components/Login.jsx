@@ -34,6 +34,7 @@ const Login = () => {
       localStorage.setItem("token", token);
       localStorage.setItem("userName", firstName);
       localStorage.setItem("username", fullName);
+      localStorage.setItem("userId", res.data.userId || res.data.id || res.data._id);
       
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email);
