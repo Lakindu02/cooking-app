@@ -171,9 +171,9 @@ const Login = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <FaDumbbell className="mx-auto text-6xl text-indigo-600 mb-2" />
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Skill Sport</h2>
+          <h2 className="text-4xl font-bold text-gray-800 mb-4">Welcome to Quick Food</h2>
           <p className="text-lg text-gray-600 max-w-md">
-            Connect with athletes. Share skills. Elevate your game.
+           Create your own cooking journey—discover, cook, and grow.
           </p>
         </motion.div>
       </div>

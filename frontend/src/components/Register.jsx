@@ -56,9 +56,9 @@ const Register = () => {
           transition={{ delay: 0.2, duration: 0.5 }}
         >
           <FaRunning className="mx-auto text-6xl text-white mb-6" />
-          <h2 className="text-4xl font-bold mb-4">Join Skill Sport</h2>
+          <h2 className="text-4xl font-bold mb-4">Join Cooking skill</h2>
           <p className="text-xl text-blue-100 max-w-md">
-            Connect with athletes worldwide and take your skills to the next level
+            Create your own cooking journey—discover, cook, and grow with us!
           </p>
           
           <motion.div 
@@ -95,7 +95,7 @@ const Register = () => {
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.4, duration: 0.5 }}
             >
-              Become part of our sports community
+              Become part of our food community
             </motion.p>
           </div>
           
