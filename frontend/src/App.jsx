@@ -5,9 +5,12 @@ import Home from "./components/Home";
 import Login from "./components/Login";
 import Register from "./components/Register";
 import ProtectedRoute from "./components/ProtectedRoute";
-import Navbar from "./components/Navbar";
 import CommunityPage from "./components/CommunityPage";
 import ProfilePage from "./components/UserProfile";
+import LearningPlans from "./components/LearningPlans";
+import LearningPlanDetails from "./components/LearningPlansDetails";
+import CreateLearningPlan from "./components/CreatePlanDetails";
+import UpdatePlanDetails from "./components/UpdateLearningPlan";
 
 import {
   auth,
@@ -53,8 +56,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
+        <Route path="/"
           element={
             <ProtectedRoute>
               <Home />
@@ -65,6 +67,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/community/:id" element={<CommunityPage />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/learning" element={<LearningPlans />} />
+        <Route path="/learning-plan/:id" element={<LearningPlanDetails />} />
+        <Route path="/create-learning-plan" element={<CreateLearningPlan />}/>
+        <Route path="/edit-learning-plan/:id" element={<UpdatePlanDetails />}/>
       </Routes>
     </Router>
   );

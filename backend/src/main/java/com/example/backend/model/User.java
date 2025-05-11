@@ -17,9 +17,11 @@ public class User {
     private String address;
     private String education;
     private List<UserSkill> skills = new ArrayList<>();
-    private List<String> followers = new ArrayList<>(); // New field
-    private List<String> following = new ArrayList<>(); // New field
-    private String photoURL; // New field for profile picture
+    private List<String> followers = new ArrayList<>();
+    private List<String> following = new ArrayList<>();
+    private String photoURL;
+    private String profilePicture;
+    private String bio;
 
     // Constructors, getters, and setters
     public User() {
@@ -111,6 +113,22 @@ public class User {
 
     public void setPhotoURL(String photoURL) {
         this.photoURL = photoURL;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public String getBio() {
+        return bio;
+    }
+
+    public void setBio(String bio) {
+        this.bio = bio;
     }
 
     // Helper methods for follow system

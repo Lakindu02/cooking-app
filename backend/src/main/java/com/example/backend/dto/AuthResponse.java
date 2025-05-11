@@ -12,6 +12,11 @@ public class AuthResponse {
         this.token = token;
     }
 
+    public AuthResponse(String token, String message) {
+        this.token = token;
+        this.message = message;
+    }
+
     public AuthResponse(String token, String message, String userId) {
         this.token = token;
         this.message = message;
@@ -27,19 +32,19 @@ public class AuthResponse {
         this.token = token;
     }
 
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
     public String getMessage() {
         return message;
     }
 
     public void setMessage(String message) {
         this.message = message;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 }

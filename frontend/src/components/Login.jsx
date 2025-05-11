@@ -25,22 +25,34 @@ const Login = () => {
         password,
       });
 
+      console.log("Login response:", res.data); // Debug log
+
       const token = res.data.token;
       const welcomeMsg = res.data.message || "";
       const usernameMatch = welcomeMsg.match(/Welcome back,\s*(.+)!/);
       const fullName = usernameMatch ? usernameMatch[1] : "User";
       const firstName = fullName.split(" ")[0];
+      const userId = res.data.userId;
+
+      console.log("Setting localStorage with:", { token, fullName, firstName, userId }); // Debug log
 
       localStorage.setItem("token", token);
       localStorage.setItem("userName", firstName);
       localStorage.setItem("username", fullName);
-      localStorage.setItem("userId", res.data.userId || res.data.id || res.data._id);
+      localStorage.setItem("userId", userId);
       
       if (rememberMe) {
         localStorage.setItem("rememberedEmail", email);
       } else {
         localStorage.removeItem("rememberedEmail");
       }
+
+      // Verify localStorage was set correctly
+      console.log("Verifying localStorage:", {
+        token: localStorage.getItem("token"),
+        username: localStorage.getItem("username"),
+        userId: localStorage.getItem("userId")
+      });
 
       toast.success(`Welcome back, ${firstName}!`, {
         position: "top-center",
@@ -54,6 +66,7 @@ const Login = () => {
 
       setTimeout(() => navigate("/"), 2000);
     } catch (err) {
+      console.error("Login error:", err.response?.data || err); // Debug log
       toast.error(err.response?.data?.message || "Login failed. Please check your credentials.", {
         position: "top-center",
       });
@@ -87,12 +100,14 @@ const Login = () => {
       const jwt = res.data.token;
       const fullName = decoded.name || "User";
       const firstName = fullName.split(" ")[0];
+      const userId = res.data.userId;
 
       localStorage.setItem("token", jwt);
       localStorage.setItem("userName", firstName);
       localStorage.setItem("username", fullName);
       localStorage.setItem("photoURL", decoded.picture || "");
       localStorage.setItem("email", decoded.email || "");
+      localStorage.setItem("userId", userId);
 
       toast.success(`Welcome, ${firstName}!`, {
         position: "top-center",
@@ -110,7 +125,7 @@ const Login = () => {
       toast.error(`Google login failed: ${err.message}`, {
         position: "top-center",
       });
-      ['token', 'userName', 'username', 'photoURL', 'email'].forEach(key => {
+      ['token', 'userName', 'username', 'photoURL', 'email', 'userId'].forEach(key => {
         localStorage.removeItem(key);
       });
     } finally {

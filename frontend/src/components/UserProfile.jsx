@@ -41,6 +41,7 @@ const ProfilePage = () => {
   const [selectedSkill, setSelectedSkill] = useState(null);
   const [skillsLoading, setSkillsLoading] = useState(false);
   const [isFollowing, setIsFollowing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   
   const navigate = useNavigate();
   const { userId: profileUserId } = useParams();
@@ -56,6 +57,49 @@ const ProfilePage = () => {
     }
   });
 
+  const handleImageUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Image size should be less than 5MB');
+      return;
+    }
+
+    try {
+      setIsUploading(true);
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('userId', currentUserId);
+
+      const response = await api.post('/users/profile/picture', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+
+      // Update profile data with new image URL
+      setProfileData(prev => ({
+        ...prev,
+        photoURL: response.data
+      }));
+
+      toast.success('Profile picture updated successfully');
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast.error('Failed to upload profile picture');
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
  useEffect(() => {
     const fetchProfileData = async () => {
       try {
@@ -64,6 +108,8 @@ const ProfilePage = () => {
         const endpoint = isCurrentUser ? "/users/profile" : `/users/${profileUserId}/profile`;
         
         const response = await api.get(endpoint);
+        console.log("Profile data response:", response.data); // Debug log
+        
         setProfileData({
           username: response.data.username,
           email: response.data.email,
@@ -71,8 +117,8 @@ const ProfilePage = () => {
           address: response.data.address || '',
           education: response.data.education || '',
           skills: response.data.skills || [],
-          followersCount: response.data.followersCount || 0,
-          followingCount: response.data.followingCount || 0,
+          followersCount: response.data.followers?.length || 0,
+          followingCount: response.data.following?.length || 0,
           photoURL: response.data.photoURL || "https://via.placeholder.com/150",
           isCurrentUser
         });
@@ -364,22 +410,63 @@ const ProfilePage = () => {
           <div className="bg-white rounded-xl shadow-sm p-6 mb-6 flex flex-col md:flex-row items-start gap-6">
             <div className="relative">
               {profileData.photoURL ? (
-                <img 
-                  src={profileData.photoURL} 
-                  alt="Profile" 
-                  className="w-24 h-24 rounded-full object-cover border-4 border-indigo-100"
-                  onError={(e) => {
-                    e.target.onerror = null; // Prevent infinite loop
-                    e.target.src = null; // Set to null instead of empty string
-                    e.target.classList.add("bg-indigo-100"); // Add fallback background
-                    e.target.classList.remove("object-cover"); // Remove object-cover if using initials
-                  }}
-                />
+                <div className="relative group">
+                  <img 
+                    src={profileData.photoURL} 
+                    alt="Profile" 
+                    className="w-24 h-24 rounded-full object-cover border-4 border-indigo-100"
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = null;
+                      e.target.classList.add("bg-indigo-100");
+                      e.target.classList.remove("object-cover");
+                    }}
+                  />
+                  {profileData.isCurrentUser && (
+                    <label 
+                      htmlFor="profile-picture-upload"
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                    >
+                      <FaEdit className="text-white text-xl" />
+                      <input
+                        id="profile-picture-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                    </label>
+                  )}
+                </div>
               ) : (
-                <div className="w-24 h-24 rounded-full border-4 border-indigo-100 bg-indigo-100 flex items-center justify-center">
-                  <span className="text-2xl font-bold text-indigo-600">
-                    {profileData.username?.charAt(0).toUpperCase() || "U"}
-                  </span>
+                <div className="relative group">
+                  <div className="w-24 h-24 rounded-full border-4 border-indigo-100 bg-indigo-100 flex items-center justify-center">
+                    <span className="text-2xl font-bold text-indigo-600">
+                      {profileData.username?.charAt(0).toUpperCase() || "U"}
+                    </span>
+                  </div>
+                  {profileData.isCurrentUser && (
+                    <label 
+                      htmlFor="profile-picture-upload"
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full opacity-0 group-hover:opacity-100 cursor-pointer transition-opacity"
+                    >
+                      <FaEdit className="text-white text-xl" />
+                      <input
+                        id="profile-picture-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                        disabled={isUploading}
+                      />
+                    </label>
+                  )}
+                </div>
+              )}
+              {isUploading && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 rounded-full">
+                  <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
                 </div>
               )}
             </div>
@@ -425,18 +512,24 @@ const ProfilePage = () => {
               
               {/* Followers/Following Count */}
               <div className="flex gap-6 mb-4">
-                <div className="flex items-center gap-2">
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition"
+                  onClick={() => navigate(`/users/${profileUserId}/followers`)}
+                >
                   <FaUserFriends className="text-indigo-500" />
                   <div>
                     <p className="text-sm text-gray-500">Followers</p>
-                    <p className="text-lg font-semibold">{profileData.followersCount}</p>
+                    <p className="text-lg font-semibold text-indigo-600">{profileData.followersCount}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-2">
+                <div 
+                  className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded-lg transition"
+                  onClick={() => navigate(`/users/${profileUserId}/following`)}
+                >
                   <FaUserFriends className="text-indigo-500" />
                   <div>
                     <p className="text-sm text-gray-500">Following</p>
-                    <p className="text-lg font-semibold">{profileData.followingCount}</p>
+                    <p className="text-lg font-semibold text-indigo-600">{profileData.followingCount}</p>
                   </div>
                 </div>
               </div>
@@ -526,12 +619,12 @@ const ProfilePage = () => {
               <div className="space-y-4">
                 <div className="flex flex-col md:flex-row gap-4 mb-4">
                   <div className="flex-1">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Sport</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Food</label>
                     <Select
                       options={availableSports}
                       value={selectedSport}
                       onChange={handleSportChange}
-                      placeholder="Select a sport"
+                      placeholder="Select a Food"
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isClearable
@@ -545,7 +638,7 @@ const ProfilePage = () => {
                       value={selectedSkill}
                       onChange={setSelectedSkill}
                       isDisabled={!selectedSport || skillsLoading}
-                      placeholder={selectedSport ? "Select a skill" : "Select a sport first"}
+                      placeholder={selectedSport ? "Select a skill" : "Select a food first"}
                       className="react-select-container"
                       classNamePrefix="react-select"
                       isClearable
@@ -558,7 +651,7 @@ const ProfilePage = () => {
                       disabled={!selectedSkill}
                       className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                      Add Skill
+                      Add  Skill
                     </button>
                   </div>
                 </div>
@@ -614,7 +707,7 @@ const ProfilePage = () => {
                       <FaStar className="text-indigo-600 text-xl" />
                     </div>
                     <h3 className="text-lg font-medium text-gray-700 mb-2">No skills added yet</h3>
-                    <p className="text-gray-500 mb-4">Add your sports skills to showcase your abilities</p>
+                    <p className="text-gray-500 mb-4">Add your cooking skills to showcase your abilities</p>
                     <button 
                       onClick={() => setEditMode(true)}
                       className="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg transition"

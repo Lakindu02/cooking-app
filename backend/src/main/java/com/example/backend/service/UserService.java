@@ -14,6 +14,7 @@ import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
 import com.google.api.client.googleapis.javanet.GoogleNetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -23,21 +24,22 @@ import java.security.GeneralSecurityException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
 
-    private final UserRepository userRepo;
+    @Autowired
+    private UserRepository userRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final SkillRepository skillRepository;
 
-    public UserService(UserRepository userRepo,
-            PasswordEncoder passwordEncoder,
+    public UserService(PasswordEncoder passwordEncoder,
             JwtService jwtService,
             SkillRepository skillRepository) {
-        this.userRepo = userRepo;
         this.passwordEncoder = passwordEncoder;
         this.jwtService = jwtService;
         this.skillRepository = skillRepository;
@@ -45,7 +47,7 @@ public class UserService {
 
     // Authentication methods
     public AuthResponse register(RegisterRequest request) {
-        if (userRepo.existsByEmail(request.getEmail())) {
+        if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already in use");
         }
 
@@ -54,14 +56,13 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
 
-        userRepo.save(user);
+        userRepository.save(user);
         String token = jwtService.generateToken(user);
-        String welcomeMessage = "Welcome back, " + user.getUsername() + "!";
-        return new AuthResponse(token, welcomeMessage, user.getId());
+        return new AuthResponse(token);
     }
 
     public AuthResponse login(LoginRequest request) {
-        User user = userRepo.findByEmail(request.getEmail())
+        User user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
@@ -75,7 +76,7 @@ public class UserService {
 
     public AuthResponse googleLogin(Map<String, String> body) {
         String idTokenString = body.get("token");
-    
+
         try {
             GoogleIdTokenVerifier verifier = new GoogleIdTokenVerifier.Builder(
                     GoogleNetHttpTransport.newTrustedTransport(),
@@ -83,44 +84,42 @@ public class UserService {
                     .setAudience(Collections
                             .singletonList("661135922934-bq9m34un9dn036j3jtjunvejlitd4ide.apps.googleusercontent.com"))
                     .build();
-    
+
             GoogleIdToken idToken = verifier.verify(idTokenString);
             if (idToken != null) {
                 Payload payload = idToken.getPayload();
-    
+
                 String email = payload.getEmail();
                 String name = (String) payload.get("name");
-    
-                User user = userRepo.findByEmail(email).orElseGet(() -> {
+
+                User user = userRepository.findByEmail(email).orElseGet(() -> {
                     User newUser = new User();
                     newUser.setEmail(email);
                     newUser.setUsername(name);
-                    return userRepo.save(newUser);
+                    return userRepository.save(newUser);
                 });
-    
+
                 String jwt = jwtService.generateToken(user);
-                String welcomeMessage = "Welcome back, " + user.getUsername() + "!";
-                return new AuthResponse(jwt, welcomeMessage, user.getId()); // 👈 Include userId
+                return new AuthResponse(jwt, "Welcome back, " + user.getUsername() + "!", user.getId());
             } else {
                 throw new RuntimeException("Invalid Google ID token");
             }
-    
+
         } catch (GeneralSecurityException | IOException e) {
             throw new RuntimeException("Google token verification failed", e);
         }
     }
-    
 
     // Profile methods
     public User getCurrentUserProfile() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        return userRepo.findByEmail(email)
+        return userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
     }
 
     public User updateUserProfile(ProfileDTO profileDTO) {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setUsername(profileDTO.getUsername());
@@ -135,7 +134,7 @@ public class UserService {
             user.setSkills(userSkills);
         }
 
-        return userRepo.save(user);
+        return userRepository.save(user);
     }
 
     // Skill methods
@@ -160,69 +159,108 @@ public class UserService {
 
     // Utility method for updating password
     public void updatePassword(String email, String newPassword) {
-        User user = userRepo.findByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         user.setPassword(passwordEncoder.encode(newPassword));
-        userRepo.save(user);
+        userRepository.save(user);
     }
 
     public List<ProfileDTO> getAllUsers() {
         String currentUserId = getCurrentUserId();
-        return userRepo.findAll().stream()
+        return userRepository.findAll().stream()
                 .map(user -> convertToProfileDTO(user, currentUserId))
                 .collect(Collectors.toList());
     }
 
     // UserService.java
-    public void followUser(String followerId, String userIdToFollow) {
-        User follower = userRepo.findById(followerId)
-                .orElseThrow(() -> new RuntimeException("Follower not found"));
-        User userToFollow = userRepo.findById(userIdToFollow)
-                .orElseThrow(() -> new RuntimeException("User to follow not found"));
+    public User followUser(String followerId, String followingId) {
+        System.out.println("=== Follow User Request ===");
+        System.out.println("Follower ID: " + followerId);
+        System.out.println("Following ID: " + followingId);
+        
+        // Prevent self-following
+        if (followerId.equals(followingId)) {
+            System.out.println("Error: Self-following attempt detected");
+            throw new RuntimeException("You cannot follow yourself");
+        }
 
-        if (!follower.getFollowing().contains(userIdToFollow)) {
-            follower.getFollowing().add(userIdToFollow);
-            userToFollow.getFollowers().add(followerId);
-            userRepo.saveAll(List.of(follower, userToFollow));
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> {
+                    System.out.println("Error: Follower not found with ID: " + followerId);
+                    return new RuntimeException("Follower not found");
+                });
+        User following = userRepository.findById(followingId)
+                .orElseThrow(() -> {
+                    System.out.println("Error: User to follow not found with ID: " + followingId);
+                    return new RuntimeException("User to follow not found");
+                });
+
+        System.out.println("Found users:");
+        System.out.println("- Follower: " + follower.getUsername() + " (ID: " + follower.getId() + ")");
+        System.out.println("- Following: " + following.getUsername() + " (ID: " + following.getId() + ")");
+
+        // Check if already following
+        if (follower.getFollowing().contains(followingId)) {
+            System.out.println("Error: Already following - Follower's following list: " + follower.getFollowing());
+            throw new RuntimeException("You are already following this user");
+        }
+
+        System.out.println("Current state:");
+        System.out.println("- Follower's following list: " + follower.getFollowing());
+        System.out.println("- Following's followers list: " + following.getFollowers());
+
+        // Add to following list
+        follower.addFollowing(followingId);
+        // Add to followers list
+        following.addFollower(followerId);
+
+        System.out.println("Updated state:");
+        System.out.println("- Follower's following list: " + follower.getFollowing());
+        System.out.println("- Following's followers list: " + following.getFollowers());
+
+        try {
+            // Save both users
+            userRepository.save(following);
+            User savedFollower = userRepository.save(follower);
+            System.out.println("Successfully saved both users");
+            return savedFollower;
+        } catch (Exception e) {
+            System.out.println("Error saving users: " + e.getMessage());
+            throw new RuntimeException("Failed to save follow relationship: " + e.getMessage());
         }
     }
 
-    public void unfollowUser(String followerId, String userIdToUnfollow) {
-        User follower = userRepo.findById(followerId)
+    public User unfollowUser(String followerId, String followingId) {
+        User follower = userRepository.findById(followerId)
                 .orElseThrow(() -> new RuntimeException("Follower not found"));
-        User userToUnfollow = userRepo.findById(userIdToUnfollow)
+        User following = userRepository.findById(followingId)
                 .orElseThrow(() -> new RuntimeException("User to unfollow not found"));
 
-        follower.getFollowing().remove(userIdToUnfollow);
-        userToUnfollow.getFollowers().remove(followerId);
-        userRepo.saveAll(List.of(follower, userToUnfollow));
+        // Remove from following list
+        follower.removeFollowing(followingId);
+        // Remove from followers list
+        following.removeFollower(followerId);
+
+        userRepository.save(following);
+        return userRepository.save(follower);
     }
 
-    public List<ProfileDTO> getUserFollowers(String userId) {
-        User user = userRepo.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        String currentUserId = getCurrentUserId();
-        return userRepo.findAllById(user.getFollowers())
-                .stream()
-                .map(follower -> convertToProfileDTO(follower, currentUserId))
-                .collect(Collectors.toList());
+    public boolean isFollowing(String followerId, String followingId) {
+        User follower = userRepository.findById(followerId)
+                .orElseThrow(() -> new RuntimeException("Follower not found"));
+        return follower.getFollowing().contains(followingId);
     }
 
-    public List<ProfileDTO> getUserFollowing(String userId) {
-        User user = userRepo.findById(userId)
+    public List<User> getFollowers(String userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        String currentUserId = getCurrentUserId();
-        return userRepo.findAllById(user.getFollowing())
-                .stream()
-                .map(following -> convertToProfileDTO(following, currentUserId))
-                .collect(Collectors.toList());
+        return userRepository.findAllById(user.getFollowers());
     }
 
-    public ProfileDTO getUserProfileById(String userId) {
-        String currentUserId = getCurrentUserId();
-        User user = userRepo.findById(userId)
+    public List<User> getFollowing(String userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
-        return convertToProfileDTO(user, currentUserId);
+        return userRepository.findAllById(user.getFollowing());
     }
 
     private ProfileDTO convertToProfileDTO(User user, String currentUserId) {
@@ -246,7 +284,36 @@ public class UserService {
 
     private String getCurrentUserId() {
         String email = SecurityContextHolder.getContext().getAuthentication().getName();
-        User user = userRepo.findByEmail(email).orElse(null);
+        User user = userRepository.findByEmail(email).orElse(null);
         return user != null ? user.getId() : null;
+    }
+
+    public Optional<ProfileDTO> getUserById(String id) {
+        return userRepository.findById(id)
+                .map(user -> convertToProfileDTO(user, getCurrentUserId()));
+    }
+
+    public List<ProfileDTO> getUserFollowers(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findAllById(user.getFollowers())
+                .stream()
+                .map(follower -> convertToProfileDTO(follower, getCurrentUserId()))
+                .collect(Collectors.toList());
+    }
+
+    public List<ProfileDTO> getUserFollowing(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userRepository.findAllById(user.getFollowing())
+                .stream()
+                .map(following -> convertToProfileDTO(following, getCurrentUserId()))
+                .collect(Collectors.toList());
+    }
+
+    public ProfileDTO getUserProfileById(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        return convertToProfileDTO(user, getCurrentUserId());
     }
 }
